@@ -1,0 +1,112 @@
+name: flexiv ci
+
+on:
+  pull_request:
+  push:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  build-linux:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # configurations
+        os:
+          - ubuntu-20.04
+        ros_distribution:
+          - foxy
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup ROS2
+        uses: ros-tooling/setup-ros@0.0.26
+        with:
+          required-ros-distributions: ${{ matrix.ros_distribution }}
+
+      - name: Extra Dependencies
+        run: |
+          pip3 install lxml
+
+      # test python packages
+      - name: Test python
+        uses: ros-tooling/action-ros-ci@0.0.19
+        id: action_ros_ci_step_python
+        with:
+          package-name: test_pkg_2
+          target-ros2-distro: ${{ matrix.ros_distribution }}
+          colcon-mixin-name: coverage-pytest
+          colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/5c45b95018788deff62202aaa831ad4c20ebe2c6/index.yaml
+
+      # test c++ packages
+      - name: Test cpp
+        uses: ros-tooling/action-ros-ci@0.0.19
+        id: action_ros_ci_step_cpp
+        with:
+          package-name: cpp_package
+          target-ros2-distro: ${{ matrix.ros_distribution }}
+          colcon-mixin-name: coverage-gcc
+          colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/5c45b95018788deff62202aaa831ad4c20ebe2c6/index.yaml
+
+      - name: Upload Logs
+        uses: actions/upload-artifact@v1
+        with:
+          name: colcon-log
+          path: ${{ steps.action_ros_ci_step.outputs.ros-workspace-directory-name }}/log
+        if: always()
+
+  # build-docker:
+  #   runs-on: ubuntu-20.04
+  #   container:
+  #     image: osrf/ros2:nightly
+  #   steps:
+  #     - name: prep
+  #       run: |
+  #         apt-get -qq update
+  #         apt-get -qq upgrade -y
+  #         apt-get -qq install -y curl libasio-dev libtinyxml2-dev
+  #         colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/5c45b95018788deff62202aaa831ad4c20ebe2c6/index.yaml
+  #         colcon mixin update default
+  #         mkdir -p src
+
+  #     - name: Checkout
+  #       uses: actions/checkout@v2
+  #       with:
+  #         path: src/
+
+  #     - run: cp src/codecov.yml .
+
+  #     - name: Rosdep
+  #       run: |
+  #         DEBIAN_FRONTEND=noninteractive sudo rosdep fix-permissions
+  #         DEBIAN_FRONTEND=noninteractive rosdep update && rosdep install --from-paths src --ignore-src --rosdistro foxy -y
+
+  #     - name: Build
+  #       run: . /opt/ros/$ROS_DISTRO/setup.sh && colcon build --event-handlers console_cohesion+ --mixin coverage-pytest --packages-select nodl_python ros2nodl --merge-install
+
+  #     - name: Run Tests
+  #       id: action_ros_ci_step
+  #       run: . /opt/ros/$ROS_DISTRO/setup.sh && colcon test --merge-install --mixin coverage-pytest --packages-select nodl_python ros2nodl --return-code-on-test-failure --event-handlers console_cohesion+
+
+  #     - uses: codecov/codecov-action@v1
+  #       with:
+  #         file: build/nodl_python/coverage.xml
+  #         fail_ci_if_error: true
+  #         flags: unittests,nodl_python
+  #         name: codecov-nodl_python
+
+  #     - uses: codecov/codecov-action@v1
+  #       with:
+  #         file: build/ros2nodl/coverage.xml
+  #         fail_ci_if_error: true
+  #         flags: unittests,ros2nodl
+  #         name: codecov-ros2nodl
+
+  #     - name: Upload Logs
+  #       uses: actions/upload-artifact@v1
+  #       with:
+  #         name: colcon-logs-linux
+  #         path: log/
+  #       if: always()
+
