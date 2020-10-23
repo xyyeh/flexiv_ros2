@@ -5,19 +5,19 @@ coverage:
     project:
       default:
         flags:
-          - nodl_python
-          - ros2nodl
-      nodl_python:
+          - cpp_package
+          - python_package
+      cpp_package:
         flags:
-          - nodl_python
-      ros2nodl:
+          - cpp_package
+      python_package:
         flags:
-          - ros2nodl
+          - python_package
 flags:
-  nodl_python:
+  cpp_package:
     paths:
-      - nodl_python
-  ros2nodl:
+      - cpp_package
+  python_package:
     paths:
-      - ros2nodl
+      - python_package
 
