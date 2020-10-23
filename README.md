@@ -1,6 +1,6 @@
 # NoDL
 
-![flexiv_ros2](https://github.com/flexiv-robotics/nodl/workflows/flexiv%20ci/badge.svg?event=push)
+https://img.shields.io/github/workflow/status/xyyeh/flexiv_ros2/flexiv%20ci
 
 CLI and parsing utilities for the ROS 2 NoDL
 
