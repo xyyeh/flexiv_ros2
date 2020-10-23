@@ -1,4 +1,4 @@
-name: flexiv ci
+name: flexiv_ci
 
 on:
   pull_request:
