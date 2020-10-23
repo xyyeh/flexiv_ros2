@@ -34,7 +34,7 @@ jobs:
         uses: ros-tooling/action-ros-ci@0.0.19
         id: action_ros_ci_step_python
         with:
-          package-name: test_pkg_2
+          package-name: python_package
           target-ros2-distro: ${{ matrix.ros_distribution }}
           colcon-mixin-name: coverage-pytest
           colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/5c45b95018788deff62202aaa831ad4c20ebe2c6/index.yaml

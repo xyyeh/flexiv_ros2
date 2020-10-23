@@ -4,7 +4,7 @@
   <name>cpp_package</name>
   <version>0.0.0</version>
   <description>TODO: Package description</description>
-  <maintainer email="xiyang.yeh@flexiv.com">xyyeh</maintainer>
+  <maintainer email="xiyangyeh@gmail.com">xyyeh</maintainer>
   <license>TODO: License declaration</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
